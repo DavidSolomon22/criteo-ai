@@ -133,3 +133,5 @@ dmypy.json
 
 # dataset
 CriteoSearchData
+criteoCategorized.csv
+partners-datasets
