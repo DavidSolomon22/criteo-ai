@@ -2,9 +2,11 @@ from partner_data_reader import PartnerDataReader
 from optimizer import Optimizer
 
 if __name__ == "__main__":
-    partner_id = '04A66CE7327C6E21493DA6F3B9AACC75'
+    partner_id = 'C0F515F0A2D0A5D9F854008BA76EB537'
     partner_data = PartnerDataReader(partner_id)
-    optimizer = Optimizer(partner_data.parnter_clicks_df, partner_id)
+    partner_clicks_df = partner_data.parnter_clicks_df
+    del partner_clicks_df[3:8]
+    optimizer = Optimizer(partner_clicks_df, partner_id)
 
     for i in range(len(optimizer.partner_data) - 1):
         today_df = optimizer.partner_data[i]

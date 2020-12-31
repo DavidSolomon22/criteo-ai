@@ -2,6 +2,7 @@ import random
 import pandas as pd
 from typing import List
 import json
+from datetime import datetime, timedelta
 
 
 # optymalizuje ktore produkty wykluczyc z reklamy na dzisiejszy/jutrzejszy dzien (zalezy od interepretacji)
@@ -11,10 +12,8 @@ class Optimizer:
         self.days = []
         self.productsSeenSoFar = []
         self.partner_id = partner_id
+        self.previous_day = None
 
-    # DONE: - zamienic today_df na set w ktorym sa product_id
-    # DONE: - przy kazdej iteracji (na sam koniec) dodawac set product_id (z today_df) do productsSeenSoFar
-    # DONE: - obliczac productsToExclude
     def next_day(self, today_df: pd.DataFrame, index: int):
         today_products_df = set(today_df['product_id'])
         productsToExclude = self.__get_excluded_products_pseudorandomly(
@@ -22,6 +21,8 @@ class Optimizer:
         productsToExcludeSet = set(productsToExclude)
         productsActuallyExcluded = sorted(list(productsToExcludeSet.intersection(
             today_products_df)))
+
+        self.__add_missing_days(today_df['click_timestamp'].iloc[0])
 
         day = {
             "day": today_df['click_timestamp'].iloc[0],
@@ -37,9 +38,10 @@ class Optimizer:
         productsSeenSoFarSet = set(self.productsSeenSoFar)
         productsSeenSoFarSet.update(today_products_df)
         self.productsSeenSoFar = sorted(list(productsSeenSoFarSet))
+        self.previous_day = today_df['click_timestamp'].iloc[0]
 
     def log_optimizations(self):
-        filename = f'partner_{self.partner_id}'
+        filename = f'../data/excluded-products/partner_{self.partner_id}.json'
         log = {
             "strategy": "random",
             "days": self.days
@@ -58,3 +60,33 @@ class Optimizer:
         excluded_products = random.sample(
             dummy_list_of_potentially_excluded_products, dummy_how_many_products)
         return sorted(excluded_products)
+
+    def __add_missing_days(self, today_date):
+        if(self.previous_day == None):
+            return
+
+        today_date_as_date = datetime.strptime(today_date, '%Y-%m-%d')
+        previous_date_as_date = datetime.strptime(
+            self.previous_day, '%Y-%m-%d')
+
+        dates_subtraction = today_date_as_date - previous_date_as_date
+
+        if dates_subtraction.days > 1:
+            for i in range(dates_subtraction.days - 1):
+                index = ((dates_subtraction.days - 1) - i)
+                day_to_add = today_date_as_date - \
+                    timedelta(days=index)
+
+                self.days.append(
+                    self.__generate_empty_day(day_to_add))
+
+    def __generate_empty_day(self, date):
+        return {
+            "day": datetime.strftime(date, '%Y-%m-%d'),
+            "productsSeenSoFar": [],
+            "productsToExclude": [],
+            "productsActuallyExcluded": []
+        }
+
+    def compare_logs(self, first_filename: str, second_filename: str) -> bool:
+        pass
