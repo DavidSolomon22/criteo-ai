@@ -23,7 +23,7 @@ class PartnerDataReader:
         pass
 
     def __read_partner_clicks(self, partner_id: str) -> pd.DataFrame:
-        filename = f'../data/mega/partner_{partner_id}.csv'
+        filename = f'../data/criteo-dataset-splitted/partner_{partner_id}.csv'
         return pd.read_csv(filename, index_col=0)
 
     def __convert_timestamp(self, parnter_clicks_df: pd.DataFrame) -> None:
