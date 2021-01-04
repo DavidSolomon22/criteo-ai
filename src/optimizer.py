@@ -7,15 +7,14 @@ from datetime import datetime, timedelta
 
 # optymalizuje ktore produkty wykluczyc z reklamy na dzisiejszy/jutrzejszy dzien (zalezy od interepretacji)
 class Optimizer:
-    def __init__(self, partner_data: List[pd.DataFrame], partner_id: str, strategy: str):
-        self.partner_data = partner_data
+    def __init__(self, partner_id: str, strategy: str):
         self.days = []
         self.productsSeenSoFar = []
         self.partner_id = partner_id
         self.previous_day = None
         self.strategy = strategy
 
-    def next_day(self, today_df: pd.DataFrame, index: int):
+    def next_day(self, today_df: pd.DataFrame):
         today_products_df = set(today_df['product_id'])
         productsToExclude = self.__get_excluded_products_pseudorandomly(
             20, 12)
@@ -49,6 +48,9 @@ class Optimizer:
         }
         with open(filename, 'w') as f:
             json.dump(log, f, indent=2)
+        print(
+            '\n---------------------------------------------------------------------------------------------------------------------------------')
+        print('\nExcluded products log generated at path: ', f'"{filename}"')
 
     def __get_excluded_products_pseudorandomly(self, how_many_ratio: float, random_seed: int):
         dummy_list_of_potentially_excluded_products = self.productsSeenSoFar
@@ -90,11 +92,10 @@ class Optimizer:
         }
 
     def compare_logs(self, first_log_path: str, second_log_path: str) -> bool:
+        print('\nexcluded-products-log: ', first_log_path)
+        print('verification-log: ', second_log_path)
         with open(first_log_path) as first_log_file:
             first_log_json = json.load(first_log_file)
         with open(second_log_path) as second_log_file:
             second_log_json = json.load(second_log_file)
-
-        print(first_log_path)
-        print(second_log_path)
         return first_log_json == second_log_json

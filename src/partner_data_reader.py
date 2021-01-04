@@ -17,10 +17,8 @@ class PartnerDataReader:
             self.total_sales_amount_in_euro, self.total_number_of_clicks)
 
         self.__convert_timestamp(self.parnter_clicks_df)
-        self.parnter_clicks_df = self.__group_df_by_day(self.parnter_clicks_df)
-
-    def next_day(self):
-        pass
+        self.parnter_clicks_per_day_dfs = self.__group_df_by_day(
+            self.parnter_clicks_df)
 
     def __read_partner_clicks(self, partner_id: str) -> pd.DataFrame:
         filename = f'../data/criteo-dataset-splitted/partner_{partner_id}.csv'
