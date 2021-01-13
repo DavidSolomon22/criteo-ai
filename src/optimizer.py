@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 
 
-# optymalizuje ktore produkty wykluczyc z reklamy na dzisiejszy/jutrzejszy dzien (zalezy od interepretacji)
+# optymalizuje ktore produkty wykluczyc z reklamy
 class Optimizer:
     def __init__(self, partner_id: str, strategy: str, per_partner_average_click_cost: float):
         self.days = []
@@ -33,8 +33,6 @@ class Optimizer:
             today_products_df)))
 
         self.__add_missing_days(today_df['click_timestamp'].iloc[0])
-
-        # ------------------------------------------------------------------------------------------------------------------------
 
         cliks_on_actually_excluded_products = today_df[today_df['product_id'].isin(
             productsActuallyExcluded)]
@@ -76,8 +74,6 @@ class Optimizer:
 
         if(today_accumulated_sustained_profit != 0):
             self.accumulated_profit_gain_ratio.append(today_profit_ratio)
-
-        # ------------------------------------------------------------------------------------------------------------------------
 
         day = {
             "day": today_df['click_timestamp'].iloc[0],
