@@ -7,12 +7,13 @@ from datetime import datetime, timedelta
 
 # optymalizuje ktore produkty wykluczyc z reklamy na dzisiejszy/jutrzejszy dzien (zalezy od interepretacji)
 class Optimizer:
-    def __init__(self, partner_id: str, strategy: str):
+    def __init__(self, partner_id: str, strategy: str, per_partner_average_click_cost: float):
         self.days = []
         self.productsSeenSoFar = []
         self.partner_id = partner_id
         self.previous_day = None
         self.strategy = strategy
+        self.per_partner_average_click_cost = per_partner_average_click_cost
 
     def next_day(self, today_df: pd.DataFrame):
         today_products_df = set(today_df['product_id'])
@@ -99,3 +100,9 @@ class Optimizer:
         with open(second_log_path) as second_log_file:
             second_log_json = json.load(second_log_file)
         return first_log_json == second_log_json
+
+    def calculate_profit(self, clicks_df: pd.DataFrame):
+        number_of_clicks_per_day = len(clicks_df)
+        partner_income = clicks_df[clicks_df['SalesAmountInEuro']
+                                   >= 0]['SalesAmountInEuro'].sum()
+        return (number_of_clicks_per_day * self.per_partner_average_click_cost) - (partner_income * 0.22)

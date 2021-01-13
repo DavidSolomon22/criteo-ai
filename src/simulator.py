@@ -9,7 +9,8 @@ class Simulator:
 
     def run_simulation(self):
         partner_data = PartnerDataReader(self.partner_id)
-        optimizer = Optimizer(self.partner_id, self.exclusion_strategy)
+        optimizer = Optimizer(self.partner_id, self.exclusion_strategy,
+                              partner_data.per_partner_average_click_cost)
 
         for i in range(len(partner_data.parnter_clicks_per_day_dfs) - 1):
             today_df = partner_data.parnter_clicks_per_day_dfs[i]
