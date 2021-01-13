@@ -40,8 +40,8 @@ class Simulator:
 
     def __plot_first_comparision(self, optimizer: Optimizer):
         plt.figure(figsize=(9, 1))
-        plt.plot(optimizer.profit_gain_list, label="Profit gain")
-        plt.plot(optimizer.sustained_profit_list, label="Sustained profit")
+        plt.plot(optimizer.profit_gain, label="Profit gain")
+        plt.plot(optimizer.sustained_profit, label="Sustained profit")
         plt.legend(loc="upper right")
         plt.ylabel('EUR')
         plt.xlabel('Days of simulation')
@@ -62,7 +62,7 @@ class Simulator:
 
     def __plot_third_comparision(self, optimizer: Optimizer):
         plt.figure(figsize=(9, 1))
-        plt.plot(optimizer.profit_ratio_list,
+        plt.plot(optimizer.accumulated_profit_gain_ratio,
                  label="Accumulated profit gain ratio")
         plt.legend(loc="lower right")
         plt.ylabel('EUR')
@@ -71,7 +71,7 @@ class Simulator:
         plt.show()
 
     def __plot_sustained_profit(self, optimizer: Optimizer):
-        plt.plot(optimizer.sustained_profit_list, label=self.partner_id)
+        plt.plot(optimizer.sustained_profit, label=self.partner_id)
         plt.legend(loc="lower right")
         plt.ylabel('Sustained profit')
         plt.xlabel('Days of simulation')
@@ -87,7 +87,7 @@ class Simulator:
         plt.show()
 
     def __plot_profit_gain(self, optimizer: Optimizer):
-        plt.plot(optimizer.profit_gain_list, label=self.partner_id)
+        plt.plot(optimizer.profit_gain, label=self.partner_id)
         plt.legend(loc="lower right")
         plt.ylabel('Profit gain')
         plt.xlabel('Days of simulation')
@@ -103,7 +103,8 @@ class Simulator:
         plt.show()
 
     def __plot_accumulated_profit_gain_ratio(self, optimizer: Optimizer):
-        plt.plot(optimizer.profit_ratio_list, label=self.partner_id)
+        plt.plot(optimizer.accumulated_profit_gain_ratio,
+                 label=self.partner_id)
         plt.legend(loc="upper right")
         plt.ylabel('Accumulated profit gain ratio')
         plt.xlabel('Days of simulation')

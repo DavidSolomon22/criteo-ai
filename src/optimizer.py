@@ -14,16 +14,20 @@ class Optimizer:
         self.previous_day = None
         self.strategy = strategy
         self.per_partner_average_click_cost = per_partner_average_click_cost
-        self.profit_gain_list = []
-        self.sustained_profit_list = []
+        self.profit_gain = []
+        self.sustained_profit = []
         self.accumulated_profit_gain = []
         self.accumulated_sustained_profit = []
-        self.profit_ratio_list = []
+        self.accumulated_profit_gain_ratio = []
 
     def next_day(self, today_df: pd.DataFrame):
         today_products_df = set(today_df['product_id'])
+
+        how_many_ratio = 3.1  # how_many_ratio for plotting
+        # how_many_ratio = 20  # how_many_ratio for logs
+
         productsToExclude = self.__get_excluded_products_pseudorandomly(
-            3.1, 12)
+            how_many_ratio, 12)
         productsToExcludeSet = set(productsToExclude)
         productsActuallyExcluded = sorted(list(productsToExcludeSet.intersection(
             today_products_df)))
@@ -32,21 +36,22 @@ class Optimizer:
 
         # ------------------------------------------------------------------------------------------------------------------------
 
-        actually_excluded_rows = today_df[today_df['product_id'].isin(
+        cliks_on_actually_excluded_products = today_df[today_df['product_id'].isin(
             productsActuallyExcluded)]
 
-        today_df_after_subtraction_actually_excluded_rows = today_df[~today_df['product_id'].isin(
+        cliks_on_not_actually_excluded_products = today_df[~today_df['product_id'].isin(
             productsActuallyExcluded)]
 
-        today_profit_gain = self.calculate_profit(actually_excluded_rows)
+        today_profit_gain = self.calculate_profit(
+            cliks_on_actually_excluded_products)
 
         today_sustained_profit = self.calculate_profit(
-            today_df_after_subtraction_actually_excluded_rows)
+            cliks_on_not_actually_excluded_products)
 
         today_sustained_profit = today_sustained_profit * -1
 
-        self.profit_gain_list.append(today_profit_gain)
-        self.sustained_profit_list.append(today_sustained_profit)
+        self.profit_gain.append(today_profit_gain)
+        self.sustained_profit.append(today_sustained_profit)
 
         today_accumulated_profit_gain = 0
         today_accumulated_sustained_profit = 0
@@ -70,7 +75,7 @@ class Optimizer:
                               today_accumulated_sustained_profit)
 
         if(today_accumulated_sustained_profit != 0):
-            self.profit_ratio_list.append(today_profit_ratio)
+            self.accumulated_profit_gain_ratio.append(today_profit_ratio)
 
         # ------------------------------------------------------------------------------------------------------------------------
 
@@ -78,9 +83,9 @@ class Optimizer:
             "day": today_df['click_timestamp'].iloc[0],
             # produkty z ostatnich dni
             "productsSeenSoFar": self.productsSeenSoFar,
-            # produkty ktore zostaly wykluczone z reklamy na dzien dzisiejszy, na podstawie jakiegos algorytmu (algorytm dziala tylko na danych historycznych - productsSeenSoFar)
+            # produkty ktore zostaly wykluczone z reklamy
             "productsToExclude": productsToExclude,
-            # produkty ktore zostaly faktycznie wykluczone z dnia dzisiejszego
+            # produkty ktore zostaly faktycznie wykluczone z reklamy
             "productsActuallyExcluded": productsActuallyExcluded
         }
         self.days.append(day)
@@ -130,13 +135,14 @@ class Optimizer:
                 day_to_add = today_date_as_date - \
                     timedelta(days=index)
 
-                self.profit_gain_list.append(0)
-                self.sustained_profit_list.append(0)
+                self.profit_gain.append(0)
+                self.sustained_profit.append(0)
                 self.accumulated_profit_gain.append(
                     self.accumulated_profit_gain[-1])
                 self.accumulated_sustained_profit.append(
                     self.accumulated_sustained_profit[-1])
-                self.profit_ratio_list.append(self.profit_ratio_list[-1])
+                self.accumulated_profit_gain_ratio.append(
+                    self.accumulated_profit_gain_ratio[-1])
 
                 self.days.append(
                     self.__generate_empty_day(day_to_add))
